@@ -4,11 +4,11 @@
 
 ## Summary
 
-IRMF is a file format used to describe [GLSL
-ES](https://en.wikipedia.org/wiki/OpenGL_ES) shaders that define the
+IRMF is a file format used to describe
+[GLSL ES](https://en.wikipedia.org/wiki/OpenGL_ES) or
+[WGSL](https://www.w3.org/TR/WGSL/) shaders that define the
 materials in a 3D object with infinite resolution. IRMF
-eliminates the need for [software
-slicers](https://en.wikipedia.org/wiki/Slicer_(3D_printing)),
+eliminates the need for [software slicers](https://en.wikipedia.org/wiki/Slicer_(3D_printing)),
 [STL](https://en.wikipedia.org/wiki/STL_(file_format)), and
 [G-code](https://en.wikipedia.org/wiki/G-code) files used in
 [3D printers](https://en.wikipedia.org/wiki/3D_printing).
@@ -65,21 +65,16 @@ every voxel (volumetric pixel) within the object. This means that the
 code has to behave differently for every (x,y,z) position within 3D
 space. Like a type press, the shader is passed a position in space and
 returns the percentages of one or more materials. When compiled and run
-in parallel (one shader per point in 3D space), it will be incredibly
+in parallel (conceptually, one shader per point in 3D space), it can be incredibly
 fast... nearly instantaneous.
 
-If the GPU does not have enough capacity to assign one shader per
-point in 3D space, the design can be diced up into cubes or slices
-and then reassembled, or more GPUs could be employed to cover the
-full 3D object at the resolution desired.
-
-Alternatively, depending on the style of 3D printer, the IRMF
+Depending on the style of 3D printer, the IRMF
 shader could be processed within the 3D printer itself and no slicing
 step would be needed at all! Light-based 3D printers are
 exceptionally well suited to this paradigm. As the 3D printer is
 ready to create material, it simply asks the IRMF shader what
 percentage of materials belong at each location, and generates the
-materials without the need for slicing at all. The 3D printer could
+materials without the need for "slicing". The 3D printer could
 simply accept the extremely compact IRMF file itself as input, then
 generate the 3D object at any resolution the printer supports. In
 fact, one option on the 3D printer might be “How fast do you want
@@ -91,7 +86,7 @@ this scenario.
 The JSON blob is used to describe the physical dimensions (the
 minimum bounding box) of the object, how many materials it uses, and
 other parameters used by the shader. The shader portion itself is a
-standard GLSL ES shader.
+standard GLSL ES or WGSL shader.
 
 ## Do IRMF shaders really have infinite resolution?
 
@@ -109,8 +104,8 @@ keyword.
 
 Why not? Check out this beauty:
 
-* [NVIDIA Brings Affordable GPU to the Edge with Jetson Nano](
-  https://thenewstack.io/nvidia-brings-affordable-gpu-to-the-edge-with-jetson-nano/)
+* [NVIDIA Jetson Nano](
+  https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-nano/product-development/)
 
 ## Inspiration
 
@@ -121,18 +116,20 @@ Shaders](https://thebookofshaders.com/) which teaches shader writing
 from the ground up.
 
 Additionally, I came across a similar use of JSON and GLSL ES called
-[ISF](https://www.interactiveshaderformat.com/) but used for video.
+[ISF](https://isf.video/) but used for video.
 
-## What is the difference between GLSL ES and IRMF?
+## What is the difference between GLSL ES (or WGSL) and IRMF?
 
 GLSL ES is the [OpenGL Shading
 Language](https://www.khronos.org/opengles/) developed by the [Khronos
 Group](https://www.khronos.org/). GLSL ES files are compiled into
 shaders that can be run in parallel on GPU cards.
+Similarly, WGSL is the WebGPU Shading Language by the
+[W3C (World Wide Web Consortium)](https://www.w3.org/).
 
-IRMF is designed to be a standard for working with GLSL ES in such a
+IRMF is designed to be a standard for working with GLSL ES or WGSL in such a
 way that 3D printers can manufacture objects at any resolution
-possible. IRMF files consist of a JSON blob followed by a GLSL ES
+possible. IRMF files consist of a JSON blob followed by a GLSL ES or WGSL
 shader.
 
 ## How are IRMF shaders different from signed distance functions (SDFs)?
@@ -170,6 +167,9 @@ need to determine if the point is inside the spiral or outside it, not how far t
 point is to the edge.
 
 This makes IRMF shaders *orders of magnitude* easier to write than SDFs.
+(Although, if you already have SDFs (as can be found in [gsdf](https://github.com/soypat/gsdf)),
+then it is trivial to make an IRMF shader from them since all that is needed is to
+test if the SDF value is less than or equal to 0.)
 IRMF shaders make boolean operations a breeze: zero times anything is zero; one
 times anything is that thing. Booleans solved. Likewise, IRMF shaders can represent
 curved surfaces as fine as the GPU can resolve... which is mighty fine.
@@ -180,11 +180,11 @@ Star Trek replicator will be a household device. “Hey replicator, print me a w
 
 ## How do I use IRMF?
 
-An [IRMF shader editor](https://github.com/gmlewis/irmf-editor) is in the works.
+An [IRMF shader editor](https://github.com/gmlewis/irmf-editor) has been written.
 See the [examples](#examples) below for models that display in the IRMF editor.
 
-I'm also working on an [IRMF slicer](https://github.com/gmlewis/irmf-slicer)
-that will provide a bridge from IRMF shaders to 3D printers that can accept
+I also wrote an [IRMF slicer](https://github.com/gmlewis/irmf-slicer)
+that provides a bridge from IRMF shaders to 3D printers that can accept
 STL or voxel image slices as input, until the time when all 3D printers natively
 support `*.irmf` files as an alternative input format to `*.gcode` files.
 

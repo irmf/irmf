@@ -1,11 +1,11 @@
-# IRMF Specification v0.0.1
+# IRMF Specification v1.0
 
 ## Background
 
 An IRMF (“Infinite Resolution Materials Format”) file is a JSON blob containing
 (required and optional) key-value pairs followed by a [GLSL ES](https://en.wikipedia.org/wiki/OpenGL_ES#OpenGL_ES_3.0)
-shader that is written such that it can “render” (or manufacture) a 3D object at
-any resolution desired.
+or [WGSL](https://www.w3.org/TR/WGSL/) shader that is written such that it can
+“render” (or manufacture) a 3D object at any resolution desired.
 The renderer or 3D printer takes advantage of an on-board GPU to freely
 slice the model in any convenient 2D plane and takes as many passes as necessary
 to fully define and fabricate the model.
@@ -42,13 +42,13 @@ Immediately following this opening are JSON key-value pairs
 (listed in any order) that describe the properties of the shader.
 Here are the keys and sample values:
 
-* `author: "<name of author>",`
+* `"author": "<name of author>",`
   * *optional* - e.g. `"Glenn M. Lewis"`
-* `copyright: "<copyright text>",`
+* `"copyright": "<copyright text>",`
   * *optional* - e.g. `"Apache-2.0"`
-* `date: "<date created>",`
+* `"date": "<date created>",`
   * *optional* - e.g. `"2019-06-28"`
-* `encoding: "<shader encoding>",`
+* `"encoding": "<shader encoding>",`
   * *optional* - this specifies the encoding of the shader portion of the file.
     Possible values are:
     * _null_ or `""` - default (ASCII) encoding.
@@ -60,12 +60,17 @@ Here are the keys and sample values:
       of [gzip'd](https://en.wikipedia.org/wiki/Gzip) binary compressed format.
       This can be useful when the IRMF shader gets large (for example, when rendering
       text in your model).
-* `glslVersion: "#version 300 es",`
+* `"glslVersion": "#version 300 es",`
   * *optional* - this specifies the GLSL version being used in the shader.
     This defaults to `"#version 300 es"`.
-* `irmf: "1.0",`
+* `"language": "<shader language>",`
+  * *required* - this specifies the shader language used.
+    Possible values are:
+    * "glsl" - GLSL ES is the shader language
+    * "wgsl" - WGSL is the shader language
+* `"irmf": "1.0",`
   * *required* - this is the _major.minor_ version of the IRMF spec.
-* `materials: ["<m1 name>","<m2 name>","<m3 name>","<m4 name>"],`
+* `"materials": ["<m1 name>","<m2 name>","<m3 name>","<m4 name>"],`
   * *required* - must be the same length as the number of material values
      output by this IRMF shader. e.g. `["support","dielectric","AISI 1018 steel"]`.
      The material name is used to identify the desired material to the 3D printer.
@@ -74,13 +79,13 @@ Here are the keys and sample values:
     * For 10-16 materials, the `mainModel16` function will be used.
     * For 17-32 materials, the `mainModel32` function will be used.
     * For 33-48 materials, the `mainModel48` function will be used, _etc_.
-* `max: [<urx>,<ury>,<urz>],`
+* `"max": [<urx>,<ury>,<urz>],`
   * *required* - upper right bounds of shader - e.g. `[0,0,0]`.
-* `min: [<llx>,<lly>,<llz>],`
+* `"min": [<llx>,<lly>,<llz>],`
   * *required* - lower left bounds of shader - e.g. `[10,12,15]`.
-* `notes: "<notes from IRMF shader author>",`
+* `"notes": "<notes from IRMF shader author>",`
   * *optional*.
-* `options: {<key1>: <value1>, <key2>: <value2> [,...]},`
+* `"options": {<key1>: <value1>, <key2>: <value2> [,...]},`
   * *optional* - These key-value pairs can be used by the renderer or 3D printer
     as custom options that control the viewing or manufacturing of models.
 
@@ -88,12 +93,12 @@ Here are the keys and sample values:
     recognize individual options will simply ignore them (possibly with a warning).
 
     *e.g.* `{ showAxes: false, showSliders: false, goldPlating: "1um" }`.
-* `title: "<name of IRMF model>",`
+* `"title": "<name of IRMF model>",`
   * *optional*
-* `units: "mm",`
+* `"units": "mm",`
   * *required* - can be `"mm"` or `"in"` or any string that the 3D printer chooses
     to support (*e.g.* `"nm"`), but the units must be specified with the model.
-* `version: "<IRMF shader version>",`
+* `"version": "<IRMF shader version>",`
   * *optional* - determined by the IRMF shader author - e.g. `"2.7"`.
 
 After the JSON key-value pairs, the following group of three characters *MUST*
@@ -101,8 +106,10 @@ be on a line by itself:
 
 * `}*/`
 
-What immediately follows this JSON blob is a GLSL ES shader
-([quick reference PDF](https://www.khronos.org/files/opengles3-quick-reference-card.pdf))
+What immediately follows this JSON blob is a GLSL ES
+([GLSL ES 3 quick reference PDF](https://www.khronos.org/files/opengles3-quick-reference-card.pdf))
+or WGSL shader
+([WGSL quick reference](https://webgpu.rocks/))
 (using the specified `encoding`) similar to a ShaderToy
 [`mainImage`](https://www.shadertoy.com/howto)
 “pixel shader” (or “full-screen fragment shader”), but instead of this
@@ -130,7 +137,7 @@ The `xyz` input can range anywhere within the minimum bounding box
 defined in the JSON blob header. The units are specified in the
 header.
 
-The renderer modifies this function on each slice of the design in order
+The renderer modifies the parameter values to this function on each slice of the design in order
 to calculate the amount of material needed at each point in 3D space. It is
 free to “zoom in” to any portion of the design to get as much detail as
 necessary to generate the model. This is why IRMF shaders have infinite
@@ -138,4 +145,4 @@ resolution. The renderer can get as much detail from the shader as it needs
 in order to manufacture the part within the alloted timeframe. Higher
 resolution models typically take more time to manufacture, so the same
 IRMF shader can be used to create quick prototypes or highly-detailed,
-final production-worthy parts.
+final production-quality parts.
