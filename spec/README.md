@@ -44,17 +44,17 @@ Here are the keys and sample values:
 
 * `"author": "<name of author>",`
   * *optional* - e.g. `"Glenn M. Lewis"`
-* `"copyright": "<copyright text>",`
+* `"license": "<license text>",`
   * *optional* - e.g. `"Apache-2.0"`
 * `"date": "<date created>",`
   * *optional* - e.g. `"2019-06-28"`
 * `"encoding": "<shader encoding>",`
   * *optional* - this specifies the encoding of the shader portion of the file.
     Possible values are:
-    * _null_ or `""` - default (ASCII) encoding.
+    * _null_ or `""` - default (UTF-8) encoding.
     * "gpg" - encrypted [GnuPG](https://gnupg.org/) ASCII-armored encoding for a
       particular device or printer manufacturer. This can be useful if someone
-      wanted to sell their model but didn't want to release the shader source code.
+      wants to sell a model but doesn't want to release the shader source code.
     * "gzip" - binary compressed [gzip](https://en.wikipedia.org/wiki/Gzip) format.
     * "gzip+base64" - ASCII [Base64](https://en.wikipedia.org/wiki/Base64) encoding
       of [gzip'd](https://en.wikipedia.org/wiki/Gzip) binary compressed format.
@@ -108,8 +108,7 @@ be on a line by itself:
 
 What immediately follows this JSON blob is a GLSL ES
 ([GLSL ES 3 quick reference PDF](https://www.khronos.org/files/opengles3-quick-reference-card.pdf))
-or WGSL shader
-([WGSL quick reference](https://webgpu.rocks/))
+or WGSL ([WGSL quick reference](https://webgpu.rocks/)) shader
 (using the specified `encoding`) similar to a ShaderToy
 [`mainImage`](https://www.shadertoy.com/howto)
 “pixel shader” (or “full-screen fragment shader”), but instead of this
@@ -137,7 +136,7 @@ The `xyz` input can range anywhere within the minimum bounding box
 defined in the JSON blob header. The units are specified in the
 header.
 
-The renderer modifies the parameter values to this function on each slice of the design in order
+The renderer modifies the parameter values of this function on each slice of the design in order
 to calculate the amount of material needed at each point in 3D space. It is
 free to “zoom in” to any portion of the design to get as much detail as
 necessary to generate the model. This is why IRMF shaders have infinite
