@@ -223,12 +223,19 @@ lossless cuboid-merging and Fourier series approximation.
 
 Furthermore, the `irmf-cal-cli` tool now provides direct integration with
 Computed Axial Lithography (CAL) and Volumetric Additive Manufacturing (VAM) hardware.
+(See https://github.com/computed-axial-lithography for more information.)
 It streamlines the entire pipeline—from IRMF model slicing and GPU-accelerated
 optimization to hardware-synchronized light projection—enabling high-resolution
 3D printing directly from IRMF shaders without the need for intermediate
 STL or G-code files.
 
-Please see the [IRMF Spec](spec) and [provided examples](#examples) for more information.
+The Laboratory of Imaging and Intelligent Technology at Tsinghua University has invented
+a 3D printing using digital incoherent synthesis of holographic light fields (DISH)
+to 3D small object in under 0.6 seconds. This technology would be a great fit for IRMF.
+(See https://www.nature.com/articles/s41586-026-10114-5 and https://github.com/sugar10w/DISH
+for more information.)
+
+Please see the [IRMF Spec](spec) and [provided examples](#examples).
 
 ## Examples
 
